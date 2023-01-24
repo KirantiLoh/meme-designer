@@ -1,3 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@layer base {
+    *::-webkit-scrollbar {
+        @apply w-1 h-1 bg-transparent;
+    }
+    *::-webkit-scrollbar-thumb {
+        @apply bg-slate-400 rounded-2xl
+    }
+    input {
+        @apply text-black px-1.5 py-1 outline-none rounded-md;
+    }
+}
+
+@layer {
+    .bordered-text {
+        -webkit-text-stroke: 1px black;
+        color: white;
+        cursor: default;
+        user-select: none;
+        text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    }
+}

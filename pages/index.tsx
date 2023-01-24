@@ -1,85 +1,130 @@
 import type { NextPage } from 'next'
-import Head from 'next/head'
-import Image from 'next/image'
+import { useDrop } from "react-dnd"
+import SideNav from '../components/SideNav'
+import { useCanvas } from '../context/CanvasContext'
+import DragElement from '../components/DragElement'
+import { useRef, useState, useEffect, MutableRefObject } from "react"
+import * as htmlToImage from 'html-to-image';
+import Button from '../components/Button'
+
 
 const Home: NextPage = () => {
+
+  const { width, height, bgColor, bgImage, layers, setBgImage } = useCanvas();
+
+  const containerRef = useRef<HTMLDivElement>() as MutableRefObject<HTMLDivElement>;
+
+  const [fileName, setFileName] = useState("meme");
+
+  const [, drop] = useDrop(() => ({
+    accept: "image",
+    drop: (item: IPicture) => setBgImage(item.url)
+  }))
+
+  const downloadImage = async () => {
+    if (!fileName) return;
+   
+    const dataUrl = await htmlToImage.toPng(containerRef.current);
+   
+    const link = document.createElement('a');
+    link.download = `${fileName}.png`;
+    link.href = dataUrl;
+    link.click();
+  }
+
+  useEffect(() => {
+    window.onbeforeunload = () => ""
+  }, []);
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center py-2">
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className="flex w-full flex-1 flex-col items-center justify-center px-20 text-center">
-        <h1 className="text-6xl font-bold">
-          Welcome to{' '}
-          <a className="text-blue-600" href="https://nextjs.org">
-            Next.js!
-          </a>
-        </h1>
-
-        <p className="mt-3 text-2xl">
-          Get started by editing{' '}
-          <code className="rounded-md bg-gray-100 p-3 font-mono text-lg">
-            pages/index.tsx
-          </code>
-        </p>
-
-        <div className="mt-6 flex max-w-4xl flex-wrap items-center justify-around sm:w-full">
-          <a
-            href="https://nextjs.org/docs"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Documentation &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Find in-depth information about Next.js features and its API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Learn &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Learn about Next.js in an interactive course with quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Examples &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Discover and deploy boilerplate example Next.js projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Deploy &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className="flex h-24 w-full items-center justify-center border-t">
-        <a
-          className="flex items-center justify-center gap-2"
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-        </a>
-      </footer>
-    </div>
+    <main className="flex h-screen overflow-y-hidden  bg-black text-white">
+      <SideNav />
+      <section className='flex flex-col flex-1'>
+        <aside className='relative flex n flex-1 justify-center items-center overflow-auto p-10'>
+          <div ref={containerRef}>
+            <div 
+              style={{
+                width,
+                height,
+                backgroundColor: bgColor,
+                backgroundRepeat: "no-repeat",
+                backgroundSize: "cover",
+                backgroundImage: `url(${bgImage})`,
+              }} 
+              className="relative flex items-center justify-center transition-all"
+              ref={drop}
+            >
+              {layers.length > 0 && layers.map((val, index) => (
+                <DragElement key={index}>
+                  {
+                    val.type === "heading" ?
+                      <h1  
+                        onDoubleClick={e => {
+                          e.currentTarget.contentEditable = "true";
+                          e.currentTarget.focus();
+                        }} 
+                        onBlur={e => {
+                          if (!e.currentTarget.textContent) {
+                            e.currentTarget.parentNode?.parentNode?.removeChild(e.currentTarget.parentNode)
+                          }
+                        }}
+                        style={{
+                          maxWidth: `${width}px`
+                        }}
+                        className="text-5xl font-bold bordered-text">
+                        {val.content}
+                      </h1>
+                    :
+                    (
+                      val.type === "subheading" ?
+                      <h3 
+                        onDoubleClick={e => {
+                          e.currentTarget.contentEditable = "true";
+                          e.currentTarget.focus();
+                        }} 
+                        onBlur={e => {
+                          if (!e.currentTarget.textContent) {
+                            e.currentTarget.parentNode?.parentNode?.removeChild(e.currentTarget.parentNode)
+                          }
+                        }}
+                        style={{
+                          maxWidth: `${width}px`
+                        }}
+                        className='text-3xl font-bold bordered-text'>
+                        {val.content}
+                      </h3>
+                      :
+                      <p 
+                        onDoubleClick={e => {
+                          e.currentTarget.contentEditable = "true";
+                          e.currentTarget.focus();
+                        }} 
+                        onBlur={e => {
+                          if (!e.currentTarget.textContent) {
+                            e.currentTarget.parentNode?.parentNode?.removeChild(e.currentTarget.parentNode)
+                          }
+                        }}
+                        style={{
+                          maxWidth: `${width}px`
+                        }}
+                        className='text-xl font-bold bordered-text'>
+                        {val.content}
+                      </p>
+                    )
+                  }
+                </DragElement>))}
+            </div>
+          </div>
+        </aside>
+        <aside className='bg-slate-800 w-full px-5 py-3 flex items-center justify-end gap-3'>
+          <div>
+            <label htmlFor="fileName" className='text-lg mr-1'>File Name:</label>
+            <input type="text" value={fileName} onChange={e => setFileName(e.target.value)} className='p-2' />
+          </div>
+          <Button disabled={!fileName} onClick={() => downloadImage()}>Download Image</Button>
+        </aside>
+      </section>
+    </main>
   )
 }
 
