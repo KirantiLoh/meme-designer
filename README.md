@@ -9,7 +9,7 @@ Baris `export {}` hanya digunakan sebagai pencegah error mempengaruhi case B
 ## Case B | Meme Designer
 Repo ini berisi pengerjaan soal case B dimana ini berisi pembuatan website yang bisa digunakan untuk mendesain.
 
-# Fitur:
+### Fitur:
 - Upload gambar dari local 
 - Mengubah ukuran canvas
 - Bisa menambah text dengan 3 ukuran khusus
