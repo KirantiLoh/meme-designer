@@ -71,7 +71,7 @@ const Home: NextPage = () => {
                         style={{
                           maxWidth: `${width}px`
                         }}
-                        className="text-5xl font-bold bordered-text">
+                        className="text-5xl font-bold bordered-text text-center">
                         {val.content}
                       </h1>
                     :
@@ -90,7 +90,7 @@ const Home: NextPage = () => {
                         style={{
                           maxWidth: `${width}px`
                         }}
-                        className='text-3xl font-bold bordered-text'>
+                        className='text-3xl font-bold bordered-text text-center'>
                         {val.content}
                       </h3>
                       :
@@ -107,7 +107,7 @@ const Home: NextPage = () => {
                         style={{
                           maxWidth: `${width}px`
                         }}
-                        className='text-xl font-bold bordered-text'>
+                        className='text-xl font-bold bordered-text text-center'>
                         {val.content}
                       </p>
                     )
